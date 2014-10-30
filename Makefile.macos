@@ -1,0 +1,9 @@
+CFLAGS=-shared -O2 -ldl
+
+mac: skype-poll-fix.o
+	$(CC) $(CFLAGS_MAC) -o skype-poll-fix.dylib skype-poll-fix.o
+
+.PHONY: clean
+
+clean:
+	rm -f *.o *~
