@@ -16,13 +16,13 @@ char* SET_POLL_C;
 char* MIN_POLL_C;
 
 #ifdef linux
-int MIN_POLL, SET_POLL = 300;
+int MIN_POLL = 300, SET_POLL = 300;
 static int (*pollmethod_orig)(struct pollfd *fds, nfds_t nfds, int timeout);
 int poll(struct pollfd *fds, nfds_t nfds, int timeout) {
 #endif
 
 #ifdef __APPLE__
-int MIN_POLL, SET_POLL = 300 * 1000000;
+int MIN_POLL = 300 * 1000000, SET_POLL = 300 * 1000000;
 static int (*pollmethod_orig)(int kq,  const struct kevent *changelist, int nchanges,
 		struct kevent *eventlist, int nevents, const struct timespec *timeout);
 int kevent(int kq,  const struct kevent *changelist, int nchanges, 
