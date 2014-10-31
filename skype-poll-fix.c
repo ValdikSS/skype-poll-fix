@@ -53,9 +53,13 @@ int kevent(int kq,  const struct kevent *changelist, int nchanges,
 #endif
 #ifdef __APPLE__
 	struct timespec new_timeout;
-	new_timeout.tv_nsec = SET_POLL * 1000000;
+
 	if (timeout->tv_nsec < MIN_POLL * 1000000) {
-		return pollmethod_orig(kq, changelist, nchanges, eventlist, nevents, &new_timeout);
+		new_timeout.tv_nsec = SET_POLL * 1000000;
 	}
+	else {
+		new_timeout = timeout;
+	}
+	return pollmethod_orig(kq, changelist, nchanges, eventlist, nevents, &new_timeout);
 #endif
 }
