@@ -1,4 +1,4 @@
-CFLAGS=-shared -O2 -ldl
+CFLAGS=-shared -O2 -ldl -arch i386
 
 mac: skype-poll-fix.o
 	$(CC) $(CFLAGS) -o skype-poll-fix.dylib skype-poll-fix.o
