@@ -58,7 +58,7 @@ int kevent(int kq,  const struct kevent *changelist, int nchanges,
 		new_timeout.tv_nsec = SET_POLL * 1000000;
 	}
 	else {
-		new_timeout = timeout;
+		new_timeout = *timeout;
 	}
 	return pollmethod_orig(kq, changelist, nchanges, eventlist, nevents, &new_timeout);
 #endif
