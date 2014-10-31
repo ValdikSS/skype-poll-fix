@@ -1,3 +1,4 @@
+
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,36 +13,52 @@
 #include <sys/time.h>
 #endif
 
+#define _STRINGIZE(x) \
+	#x
+#define STRINGIZE(x) \
+	_STRINGIZE(x)
+
+#if defined(linux)
+#	define POLL_FUNC_SIG struct pollfd *fds, nfds_t nfds, int timeout
+#	define POLL_FUNC_NAME poll
+#elif defined(__APPLE__)
+#	define POLL_FUNC_SIG int kq,  const struct kevent *changelist, int nchanges, \
+								struct kevent *eventlist, int nevents, \
+								const struct timespec *timeout
+#	define POLL_FUNC_NAME kevent
+#else
+#	error "bad platform"
+#endif // if defined(linux)
+
+/***************************************************************************/
+
+static int is_only_digits(const char *str) {
+	for ( ; *str; ++str) {
+		if ( !isdigit(*str) )
+			return 0;
+	}
+
+	return 1;
+}
+
+/***************************************************************************/
+
 char* SET_POLL_C;
 char* MIN_POLL_C;
 
 int MIN_POLL = 300, SET_POLL = 300;
 
-#ifdef linux
-static int (*pollmethod_orig)(struct pollfd *fds, nfds_t nfds, int timeout);
-int poll(struct pollfd *fds, nfds_t nfds, int timeout) {
-#endif
+static __typeof__(&POLL_FUNC_NAME) pollmethod_orig = 0;
 
-#ifdef __APPLE__
-static int (*pollmethod_orig)(int kq,  const struct kevent *changelist, int nchanges,
-		struct kevent *eventlist, int nevents, const struct timespec *timeout);
-int kevent(int kq,  const struct kevent *changelist, int nchanges, 
-		struct kevent *eventlist, int nevents, const struct timespec *timeout) {
-#endif
-
+int POLL_FUNC_NAME(POLL_FUNC_SIG) {
 	if (pollmethod_orig == NULL) {
-#ifdef linux
-		pollmethod_orig = dlsym(RTLD_NEXT, "poll");
-#endif
-#ifdef __APPLE__
-		pollmethod_orig = dlsym(RTLD_NEXT, "kevent");
-#endif
+		pollmethod_orig = dlsym(RTLD_NEXT, STRINGIZE(POLL_FUNC_NAME));
 		MIN_POLL_C = getenv("MIN_POLL");
 		SET_POLL_C = getenv("SET_POLL");
-		if (MIN_POLL_C) {
+		if (MIN_POLL_C && is_only_digits(MIN_POLL_C)) {
 			MIN_POLL = atoi(MIN_POLL_C);
 		}
-		if (SET_POLL_C) {
+		if (SET_POLL_C && is_only_digits(SET_POLL_C)) {
 			SET_POLL = atoi(SET_POLL_C);
 		}
 	}
@@ -63,3 +80,5 @@ int kevent(int kq,  const struct kevent *changelist, int nchanges,
 	return pollmethod_orig(kq, changelist, nchanges, eventlist, nevents, &new_timeout);
 #endif
 }
+
+/***************************************************************************/
