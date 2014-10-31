@@ -32,6 +32,17 @@
 
 /***************************************************************************/
 
+static int is_only_digits(const char *str) {
+	for ( ; *str; ++str) {
+		if ( !isdigit(*str) )
+			return 0;
+	}
+
+	return 1;
+}
+
+/***************************************************************************/
+
 char* SET_POLL_C;
 char* MIN_POLL_C;
 
@@ -44,10 +55,10 @@ int POLL_FUNC_NAME(POLL_FUNC_SIG) {
 		pollmethod_orig = dlsym(RTLD_NEXT, STRINGIZE(POLL_FUNC_NAME));
 		MIN_POLL_C = getenv("MIN_POLL");
 		SET_POLL_C = getenv("SET_POLL");
-		if (MIN_POLL_C) {
+		if (MIN_POLL_C && is_only_digits(MIN_POLL_C)) {
 			MIN_POLL = atoi(MIN_POLL_C);
 		}
-		if (SET_POLL_C) {
+		if (SET_POLL_C && is_only_digits(SET_POLL_C)) {
 			SET_POLL = atoi(SET_POLL_C);
 		}
 	}
@@ -58,11 +69,15 @@ int POLL_FUNC_NAME(POLL_FUNC_SIG) {
 	return pollmethod_orig(fds, nfds, timeout);
 #endif
 #ifdef __APPLE__
-	struct timespec new_timeout = {0,0};
-	new_timeout.tv_nsec = SET_POLL * 1000000;
+	struct timespec new_timeout;
+
 	if (timeout->tv_nsec < MIN_POLL * 1000000) {
-		return pollmethod_orig(kq, changelist, nchanges, eventlist, nevents, &new_timeout);
+		new_timeout.tv_nsec = SET_POLL * 1000000;
 	}
+	else {
+		new_timeout = *timeout;
+	}
+	return pollmethod_orig(kq, changelist, nchanges, eventlist, nevents, &new_timeout);
 #endif
 }
 
