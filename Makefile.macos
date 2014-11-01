@@ -1,9 +1,0 @@
-CFLAGS=-arch i386 -arch x86_64 -shared -O2 -ldl
-
-mac: skype-poll-fix.o
-	$(CC) $(CFLAGS) -o skype-poll-fix.dylib skype-poll-fix.o
-
-.PHONY: clean
-
-clean:
-	rm -f *.o *~
