@@ -11,6 +11,7 @@
 #ifdef __APPLE__
 #include <sys/event.h>
 #include <sys/time.h>
+#include <ctype.h>
 #endif
 
 #define _STRINGIZE(x) \
