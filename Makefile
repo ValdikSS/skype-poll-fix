@@ -3,7 +3,7 @@ OS := $(shell uname -s)
 all: skype-poll-fix.c
 ifeq ($(OS),Linux)
 	@echo "Building 32-bit linux shared-library skype-poll-fix.so..."
-	$(CC) -shared -m32 -O2 -ldl -o skype-poll-fix.so skype-poll-fix.c
+	$(CC) -shared -m32 -O2 -o skype-poll-fix.so skype-poll-fix.c -ldl
 endif
 ifeq ($(OS),Darwin)
 	@echo "Building Darwing shared-library skype-poll-fix.dylib..."
