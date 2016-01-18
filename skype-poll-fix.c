@@ -64,7 +64,7 @@ int POLL_FUNC_NAME(POLL_FUNC_SIG) {
 		}
 	}
 #ifdef linux
-	if (timeout < MIN_POLL) {
+	if (timeout>=0 && timeout < MIN_POLL) {
 		timeout = SET_POLL;
 	}
 	return pollmethod_orig(fds, nfds, timeout);
