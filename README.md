@@ -5,7 +5,9 @@ This library is made to reduce Skype CPU consumption by increasing poll (on Linu
 How to use
 ----------
 * Compile the source code with ```make```
-* Run Skype with ```LD_PRELOAD=/path/to/skype-poll-fix.so skype``` on Linux or with ```DYLD_INSERT_LIBRARIES=/path/to/skype-poll-fix.dylib skype``` on Mac OS.
+* Run Skype with ```LD_PRELOAD=/path/to/skype-poll-fix.so skype``` on Linux or with ```DYLD_INSERT_LIBRARIES=/path/to/skype-poll-fix.dylib skype``` on Mac OS
+* On Linux you can edit ```/usr/share/applications/skype.desktop``` file  to run Skype with ```skype-poll-fix.so``` automatically (example for Debian Jessie):
+  * Change ```Exec=``` string to ```Exec=env LD_PRELOAD=/path/to/skype-poll-fix.so skype %U```
 
 Configuration
 -------------
