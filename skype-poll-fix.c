@@ -51,6 +51,15 @@ int MIN_POLL = 300, SET_POLL = 300;
 
 static __typeof__(&POLL_FUNC_NAME) pollmethod_orig = 0;
 
+__attribute__((constructor))
+static void clear_enviroment(void) {
+	// unset, so binaries launched by Skype (e.g. web browser)
+	// won't inherit these environment variables
+	unsetenv("MIN_POLL");
+	unsetenv("SET_POLL");
+	unsetenv("LD_PRELOAD");
+}
+
 int POLL_FUNC_NAME(POLL_FUNC_SIG) {
 	if (pollmethod_orig == NULL) {
 		pollmethod_orig = dlsym(RTLD_NEXT, STRINGIZE(POLL_FUNC_NAME));
